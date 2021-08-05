@@ -59,6 +59,43 @@ We will eventually need the following variables mapped in our pipeline:
 **subscriptionId** = [found here](https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade) <br>
 **resourceGroupName** = whatever-you-want-rg <br>
 	
+<br><br><br>
+
+# 🗐 Agile Planning 
+> The purpose of this  section is to get us aquainted with how we manage project requirement within Azure DevOps. Along the way we will be creating work items that will be leveraged in later sections.
+- Setting the Process Type
+- Defining Sprints and Areas
+- Setting Capacity
+- Determining a Story Point strategy
+- Creating Backlog items
+- Creating Task items
+- Applying Tags
+- Understanding Columns & States
+- Leveraging the Burndown Chart
+
+<br><br><br>
+
+# 🗐 Version Control
+- Repository Hosting
+- git vs TFVC
+- Utilizing Branches
+- Setting Branch Policies
+- Creating Pull Requests
 
 
+<br><br><br>
 
+# 🗐 Continuous Integration
+- Pipelines (classic vs YAML)
+- Advantages of using YAML Pipelines
+- Designing your pipeline (multi-build, multi-stage, etc.)
+- Utilizing Artifacts
+
+
+<br><br><br>
+
+# 🗐 Continuous Deployment
+
+<br><br><br>
+
+# 🗐 Infrastructure as Code
