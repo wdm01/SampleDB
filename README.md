@@ -90,12 +90,19 @@ We will eventually need the following variables mapped in our pipeline:
 - Advantages of using YAML Pipelines
 - Designing your pipeline (multi-build, multi-stage, etc.)
 - Utilizing Artifacts
+- Defining pipeline variables
 
 
 <br><br><br>
 
 # 🗐 Continuous Deployment
+- Running your pipeline manually
+- Triggering our pipeline via a trigger
+- Conditional Stages
 
 <br><br><br>
 
 # 🗐 Infrastructure as Code
+- Utilize ARM templates
+- Alternatives to ARM (Chef, Puppet, Terraform, etc.)
+- Desired State Configuration (DSC) & Idempotence in deployments
