@@ -11,6 +11,7 @@ variables:
 trigger:
 - development
 - master
+- release/*
 
 stages:
 - stage: Build
@@ -42,12 +43,59 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
 
-
+      - script: |
+            echo ${{variables['Build.SourceBranchName']}} # outputs my value
 
 - stage: Development
-
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'development'))
   jobs:
     - job: 'Development'
+
+      pool:
+        vmImage: vs2017-win2016
+        
+      steps:  
+
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Dowload Artifacts'
+        inputs:
+          buildType: 'current'
+          downloadType: 'specific'
+          downloadPath: '$(System.ArtifactsDirectory)'
+
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: '$(azureResourceManagerConnection)'
+          subscriptionId: '$(subscriptionId)'
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: '$(resourceGroupName)'
+          location: 'eastus'
+          templateLocation: 'Linked artifact'
+          csmFile: '$(System.ArtifactsDirectory)/drop/azuredeploy.json'
+          csmParametersFile: '$(System.ArtifactsDirectory)/drop/azuredeploy.parameters.json'
+          overrideParameters: '-administratorLogin $(adminUser) -administratorLoginPassword $(ARM_PASS) -serverName $(serverName)'
+          deploymentMode: 'Incremental'
+
+      - task: SqlAzureDacpacDeployment@1
+        inputs:
+          azureSubscription: '$(azureResourceManagerConnection)'
+          ServerName: ' $(serverName).database.windows.net'
+          DatabaseName: 'SampleDB'
+          SqlUsername: '$(adminUser)'
+          SqlPassword: '$(ARM_PASS)'
+          DacpacFile: '$(System.ArtifactsDirectory)\drop\SampleDB\bin\Release\SampleDB.dacpac'
+
+
+
+
+
+- stage: Production
+  condition: eq(variables['Build.SourceBranchName'], 'master')
+
+  jobs:
+    - job: 'Production'
 
       pool:
         vmImage: vs2017-win2016
