@@ -69,8 +69,8 @@ We will eventually need the following variables mapped in our pipeline:
 - Determining a Story Point strategy
 - Creating Backlog items
 - Creating Task items
-- Applying Tags
 - Understanding Columns & States
+- Swimlanes, Tags and Column Splitting for added organization
 - Leveraging the Burndown Chart
 
 <br><br><br>
