@@ -1,0 +1,86 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+
+variables:
+  ARM_PASS: $(adminPass)
+
+
+trigger:
+- development
+- master
+
+stages:
+- stage: Build
+
+  jobs:
+    - job: 'Solution'
+
+      pool:
+        vmImage: vs2017-win2016
+
+      steps:
+      - task: VSBuild@1
+        displayName: 'Build solution'
+        inputs:
+          solution: '**\*.sln'
+          configuration: 'Release'
+
+
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: './'
+          Contents: '**'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish artifact'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
+
+
+- stage: Development
+
+  jobs:
+    - job: 'Development'
+
+      pool:
+        vmImage: vs2017-win2016
+        
+      steps:  
+
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Dowload Artifacts'
+        inputs:
+          buildType: 'current'
+          downloadType: 'specific'
+          downloadPath: '$(System.ArtifactsDirectory)'
+
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: '$(azureResourceManagerConnection)'
+          subscriptionId: '$(subscriptionId)'
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: '$(resourceGroupName)'
+          location: 'eastus'
+          templateLocation: 'Linked artifact'
+          csmFile: '$(System.ArtifactsDirectory)/drop/azuredeploy.json'
+          csmParametersFile: '$(System.ArtifactsDirectory)/drop/azuredeploy.parameters.json'
+          overrideParameters: '-administratorLogin $(adminUser) -administratorLoginPassword $(ARM_PASS) -serverName $(serverName)'
+          deploymentMode: 'Incremental'
+
+      - task: SqlAzureDacpacDeployment@1
+        inputs:
+          azureSubscription: '$(azureResourceManagerConnection)'
+          ServerName: ' $(serverName).database.windows.net'
+          DatabaseName: 'SampleDB'
+          SqlUsername: '$(adminUser)'
+          SqlPassword: '$(ARM_PASS)'
+          DacpacFile: '$(System.ArtifactsDirectory)\drop\SampleDB\bin\Release\SampleDB.dacpac'
